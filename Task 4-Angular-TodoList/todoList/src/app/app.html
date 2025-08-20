@@ -1,0 +1,161 @@
+<div class="container-fluid py-4 bg-light min-vh-100">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="text-center">
+        <h1 class="display-4 fw-bold text-primary mb-2">Todo List Manager</h1>
+        <p class="lead text-muted">Task 4 - Todo List </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+          <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fas fa-search text-muted"></i>
+                </span>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  placeholder="Search todos by title..."
+                  [(ngModel)]="searchTerm">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select 
+                class="form-select" 
+                [(ngModel)]="searchScope">
+                <option value="all">Search All</option>
+                <option value="pending">Search Pending Only</option>
+                <option value="completed">Search Completed Only</option>
+              </select>
+            </div>
+            <div class="col-md-3 text-md-end mt-2 mt-md-0">
+              @if (searchTerm) {
+                <button 
+                  type="button" 
+                  class="btn btn-outline-secondary btn-sm"
+                  (click)="clearSearch()">
+                  <i class="fas fa-times me-1"></i>
+                  Clear Search
+                </button>
+              }
+              @if (searchTerm) {
+                <small class="text-muted ms-2 d-block mt-1">
+                  Searching for: <strong>"{{ searchTerm }}"</strong><br>
+                  <span class="badge bg-secondary">{{ getScopeText() }}</span>
+                </small>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <app-add-todo></app-add-todo>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card h-100 shadow">
+        <div class="card-header bg-warning text-dark">
+          <h4 class="mb-0">
+            <i class="fas fa-clock me-2"></i>
+            Pending Tasks
+            <span class="badge bg-dark ms-2">{{ (pendingTodos$ | async)?.length || 0 }}</span>
+            @if (searchTerm) {
+              <small class="ms-2 fw-normal">
+                (filtered)
+              </small>
+            }
+          </h4>
+        </div>
+                 <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+           @if ((pendingTodos$ | async)?.length === 0) {
+             <div class="text-center py-5">
+               @if (searchTerm && searchScope !== 'completed') {
+                 <i class="fas fa-search display-1 text-muted mb-3"></i>
+                 <h5 class="text-muted">No pending tasks found!</h5>
+                 <p class="text-muted">No pending tasks match your search for <strong>"{{ searchTerm }}"</strong></p>
+                 <button class="btn btn-outline-secondary btn-sm" (click)="clearSearch()">
+                   Clear Search
+                 </button>
+               } @else if (searchTerm && searchScope === 'completed') {
+                 <i class="fas fa-info-circle display-1 text-muted mb-3"></i>
+                 <h5 class="text-muted">Searching in Completed Tasks</h5>
+                 <p class="text-muted">Currently searching in completed tasks only</p>
+                 <button class="btn btn-outline-secondary btn-sm" (click)="clearSearch()">
+                   Clear Search
+                 </button>
+               } @else {
+                 <i class="fas fa-check-circle display-1 text-muted mb-3"></i>
+                 <h5 class="text-muted">No pending tasks!</h5>
+                 <p class="text-muted">All your tasks are completed. Add a new one above.</p>
+               }
+             </div>
+           }
+
+           @for (todo of (pendingTodos$ | async); track todo._id) {
+             <app-todo-item [todo]="todo"></app-todo-item>
+           }
+         </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card h-100 shadow">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-check-circle me-2"></i>
+            Completed Tasks
+            <span class="badge bg-light text-dark ms-2">{{ (completedTodos$ | async)?.length || 0 }}</span>
+            @if (searchTerm) {
+              <small class="ms-2 fw-normal">
+                (filtered)
+              </small>
+            }
+          </h4>
+        </div>
+                 <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+           @if ((completedTodos$ | async)?.length === 0) {
+             <div class="text-center py-5">
+               @if (searchTerm && searchScope !== 'pending') {
+                 <i class="fas fa-search display-1 text-muted mb-3"></i>
+                 <h5 class="text-muted">No completed tasks found!</h5>
+                 <p class="text-muted">No completed tasks match your search for <strong>"{{ searchTerm }}"</strong></p>
+                 <button class="btn btn-outline-secondary btn-sm" (click)="clearSearch()">
+                   Clear Search
+                 </button>
+               } @else if (searchTerm && searchScope === 'pending') {
+                 <i class="fas fa-info-circle display-1 text-muted mb-3"></i>
+                 <h5 class="text-muted">Searching in Pending Tasks</h5>
+                 <p class="text-muted">Currently searching in pending tasks only</p>
+                 <button class="btn btn-outline-secondary btn-sm" (click)="clearSearch()">
+                   Clear Search
+                 </button>
+               } @else {
+                 <i class="fas fa-tasks display-1 text-muted mb-3"></i>
+                 <h5 class="text-muted">No completed tasks yet!</h5>
+                 <p class="text-muted">Complete some pending tasks to see them here.</p>
+               }
+             </div>
+           }
+
+           @for (todo of (completedTodos$ | async); track todo._id) {
+             <app-todo-item [todo]="todo"></app-todo-item>
+        }
+      </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+<router-outlet />

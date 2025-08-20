@@ -1,0 +1,85 @@
+<div class="card mb-4 shadow-sm">
+  <div class="card-header bg-primary text-white">
+    <div class="d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">
+        <i class="fas fa-plus me-2"></i>
+        Add New Todo
+      </h5>
+      <button 
+        type="button"
+        class="btn btn-light btn-sm"
+        (click)="toggleForm()"
+        [attr.aria-expanded]="isFormVisible">
+        {{ isFormVisible ? 'Cancel' : 'Add Todo' }}
+      </button>
+    </div>
+  </div>
+
+  @if (isFormVisible) {
+    <div class="card-body">
+    <form [formGroup]="todoForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="title" class="form-label">
+          Title <span class="text-danger">*</span>
+        </label>
+        <input 
+          type="text"
+          id="title"
+          class="form-control"
+          [class.is-invalid]="hasFieldError('title')"
+          formControlName="title"
+          placeholder="Enter todo title..."
+          maxlength="100">
+        @if (hasFieldError('title')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('title') }}
+          </div>
+        }
+        <div class="form-text">
+          {{ todoForm.get('title')?.value?.length || 0 }}/100 characters
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description (Optional)</label>
+        <textarea 
+          id="description"
+          class="form-control"
+          [class.is-invalid]="hasFieldError('description')"
+          formControlName="description"
+          placeholder="Enter todo description..."
+          rows="3"
+          maxlength="500"></textarea>
+        @if (hasFieldError('description')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('description') }}
+          </div>
+        }
+        <div class="form-text">
+          {{ todoForm.get('description')?.value?.length || 0 }}/500 characters
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button 
+          type="submit"
+          class="btn btn-success"
+          [disabled]="isLoading || todoForm.invalid">
+          @if (isLoading) {
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          }
+          {{ isLoading ? 'Creating...' : 'Create Todo' }}
+        </button>
+        
+        <button 
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="resetForm()"
+          [disabled]="isLoading">
+          Reset
+        </button>
+      </div>
+    </form>
+    </div>
+  }
+</div>
